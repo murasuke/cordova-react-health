@@ -1,5 +1,5 @@
 {
-  "name": "hello-cordova-react",
+  "name": "cordova_react_health",
   "version": "0.1.0",
   "private": true,
   "homepage": ".",
@@ -45,7 +45,7 @@
   "devDependencies": {
     "cordova-android": "^9.1.0",
     "cordova-browser": "^6.0.0",
-    "cordova-plugin-vibration": "^3.1.1",
+    "cordova-plugin-health": "^2.0.3",
     "rewire": "^5.0.0"
   },
   "cordova": {
@@ -54,7 +54,12 @@
       "android"
     ],
     "plugins": {
-      "cordova-plugin-vibration": {}
+      "cordova-plugin-health": {
+        "HEALTH_READ_PERMISSION": "App needs read access",
+        "HEALTH_WRITE_PERMISSION": "App needs write access",
+        "FIT_API_VERSION": "20.0.0",
+        "PLAY_AUTH_VERSION": "19.0.0"
+      }
     }
   }
 }
