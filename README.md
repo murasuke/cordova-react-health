@@ -18,7 +18,3 @@ cordova plugin add cordova-plugin-health --variable HEALTH_READ_PERMISSION='App 
 
 `config.xml`に`<preference name="AndroidXEnabled" value="true" />`を追加
 
-https://developers.google.com/fit/android/get-api-key
-
-
-549754340140-42ch893uf5q5f7h8atcbg61uv39khnr6.apps.googleusercontent.com
