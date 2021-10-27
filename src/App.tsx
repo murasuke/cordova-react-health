@@ -8,8 +8,8 @@ const click = () => {
   // alert('test');
 };
 
-var successCallback = function () {
-  console.log('success');
+var successCallback = function (available: any) {
+  console.log(available);
   promptInstallFit();
 };
 

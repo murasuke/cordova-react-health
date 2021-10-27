@@ -23,4 +23,12 @@
         <allow-intent href="itms-apps:*" />
     </platform>
     <preference name="AndroidXEnabled" value="true" />
+    <!-- Health plugin -->
+    <plugin name="cordova-plugin-health" source="npm">
+        <variable name="HEALTH_READ_PERMISSION" value="App needs read access"/>
+        <variable name="HEALTH_WRITE_PERMISSION" value="App needs write access"/>
+        <variable name="GMS_VERSION" value="16.0.1"/>
+        <variable name="PLAY_AUTH_VERSION" value="19.0.0"/>
+        <variable name="FIT_API_VERSION" value="20.0.0"/>
+    </plugin>
 </widget>
