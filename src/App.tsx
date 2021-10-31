@@ -1,100 +1,85 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-const click = () => {
-  //navigator.vibrate(1000);
-  (navigator as any).health.isAvailable(successCallback, errorCallback);
-  // alert('test');
+type queryData = {
+  endDate: Date;
+  startDate: Date;
+  unit: string;
+  value: number;
 };
 
-var successCallback = function (available: any) {
-  console.log(available);
-  promptInstallFit();
-};
+const App = () => {
+  const [stepResult, setStepElement] = useState<React.ReactElement>();
 
-var errorCallback = function (msg: any) {
-  console.log(`error: ${msg}`);
-};
+  const clickHandler = () => {
+    (navigator as any).health.isAvailable(
+      successAvailableCallback,
+      (err: any) => {
+        console.log(`isAvailable error: ${err}`);
+      },
+    );
+  };
 
-function App() {
+  const successAvailableCallback = (available: boolean) => {
+    (navigator as any).promptInstallFit(requestAuthorization, (err: any) => {
+      console.error(`promptInstallFit error: ${err}`);
+    });
+  };
+
+  const requestAuthorization = () => {
+    (navigator as any).health.requestAuthorization(
+      [
+        {
+          read: ['steps'],
+        },
+      ],
+      queryAggregated,
+      (err: any) => {
+        console.error(`requestAuthorization error: ${err}`);
+      },
+    );
+  };
+
+  const queryAggregated = () => {
+    (navigator as any).health.queryAggregated(
+      {
+        startDate: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000),
+        endDate: new Date(),
+        dataType: 'steps',
+        bucket: 'day',
+      },
+      queryAggregatedSuccessCallback,
+      (err: any) => {
+        console.error(`queryAggregated error: ${err}`);
+      },
+    );
+  };
+
+  const queryAggregatedSuccessCallback = (data: queryData[]) => {
+    const totalStep = data.reduce((prev, cur) => prev + cur.value, 0);
+    console.log(`today step count ${data.slice(-1)[0]}`);
+    console.log(`1 month total  ${totalStep.toFixed(1)}`);
+    console.log(`step per day ${(totalStep / data.length).toFixed(1)}`);
+
+    const result = (
+      <div>
+        <div>{`today step count: ${data.slice(-1)[0].value}`}</div>
+        <div>{`1 month total count: ${totalStep.toFixed(1)}`}</div>
+      </div>
+    );
+    setStepElement(result);
+  };
+
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <button onClick={click}>click</button>
+        <button onClick={clickHandler}>get step count from google fit</button>
+        <div>{stepResult}</div>
       </header>
     </div>
   );
-}
-const promptInstallFit = () => {
-  (navigator as any).health.promptInstallFit(
-    function (data: any) {
-      (navigator as any).health.requestAuthorization(
-        [
-          {
-            read: ['steps'],
-          },
-        ],
-        function (data: any) {
-          (navigator as any).health.queryAggregated(
-            {
-              startDate: new Date(
-                new Date().getTime() - 27 * 24 * 60 * 60 * 1000,
-              ),
-              endDate: new Date(),
-              dataType: 'steps',
-              bucket: 'day',
-            },
-            query1monthSuccessCallback,
-            (err: any) => {},
-          );
-        },
-        function (err: any) {
-          // ons.notification.alert({
-          //   title: 'エラー',
-          //   message: '歩数を取得する権限が許可されていません。',
-          //   callback: function (index) {},
-          // });
-          console.error(`歩数を取得する権限が許可されていません。${err}`);
-        },
-      );
-    },
-    function (err: any) {
-      //alert("この端末に、GoogleFitがインストールされていません。歩数の連携を行うにはGoogleFitアプリをインストールしてください。"+err);
-      // ons.notification.alert({
-      //   title: 'エラー',
-      //   message:
-      //     'この端末に、GoogleFitがインストールされていません。歩数の連携を行うにはGoogleFitアプリをインストールしてください。',
-      //   callback: function (index) {},
-      // });
-      console.error(
-        'この端末に、GoogleFitがインストールされていません。歩数の連携を行うにはGoogleFitアプリをインストールしてください。',
-      );
-    },
-  );
-};
-
-var query1monthSuccessCallback = function (msg3: any) {
-  //alert("１ヶ月：" + JSON.stringify(msg3))
-
-  var total = 0;
-  for (var i = msg3.length - 1; i >= 0; i--) {
-    //alert(i)
-    if (msg3[i]) {
-      if (msg3[i].value) {
-        total = total + msg3[i].value;
-      }
-    }
-
-    if (i === msg3.length - 1) {
-      console.log(`stepToday ${total.toFixed(1)}`);
-    } else if (i === msg3.length - 14) {
-      console.log(`step2week ${(total / 14).toFixed(1)}`);
-    }
-
-    console.log(`step1month ${(total / msg3.length).toFixed(1)}`);
-  }
 };
 
 export default App;
