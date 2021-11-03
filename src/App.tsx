@@ -1,82 +1,100 @@
-import React, { useState } from 'react';
-import logo from './logo.svg';
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import { Bar, Chart } from 'react-chartjs-2';
 import './App.css';
-
-type queryData = {
-  endDate: Date;
-  startDate: Date;
-  unit: string;
-  value: number;
-};
+import useFitStepData from './hooks/use-fit-api';
 
 const App = () => {
+  const [dayRange, setDayRange] = useState(6);
+  const { getStepData, queryData } = useFitStepData(dayRange);
   const [stepResult, setStepElement] = useState<React.ReactElement>();
 
-  const clickHandler = () => {
-    (navigator as any).health.isAvailable(
-      successAvailableCallback,
-      (err: any) => {
-        console.log(`isAvailable error: ${err}`);
-      },
+  const df = new Intl.DateTimeFormat('ja-JP', {
+    month: '2-digit',
+    day: '2-digit',
+  });
+
+  const dw = new Intl.DateTimeFormat('ja-JP', {
+    weekday: 'short',
+  });
+
+  const onDaysChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = Number.parseInt(e.target.value, 10) - 1;
+    if (value >= 0 && value < 60) {
+      setDayRange(value);
+    } else {
+      e.preventDefault();
+      if (e.target.value !== '') {
+        e.target.value = dayRange.toString();
+      }
+    }
+  };
+
+  useEffect(() => {
+    //getStepData();
+    const totalStep = queryData?.reduce((prev, cur) => prev + cur.value, 0);
+    const nf = new Intl.NumberFormat('ja-JP');
+
+    const stepElement = (
+      <>
+        {!queryData ? null : (
+          <div>
+            <div>{`本日(${df.format(
+              queryData[0].startDate,
+            )})の歩数: ${nf.format(queryData[0].value)}`}</div>
+            <div>{`直近${queryData.length}日合計: ${
+              totalStep && nf.format(totalStep)
+            }`}</div>
+          </div>
+        )}
+      </>
     );
-  };
+    setStepElement(stepElement);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryData]);
 
-  const successAvailableCallback = (available: boolean) => {
-    (navigator as any).promptInstallFit(requestAuthorization, (err: any) => {
-      console.error(`promptInstallFit error: ${err}`);
-    });
-  };
+  const rev = queryData?.slice().reverse();
 
-  const requestAuthorization = () => {
-    (navigator as any).health.requestAuthorization(
-      [
-        {
-          read: ['steps'],
-        },
-      ],
-      queryAggregated,
-      (err: any) => {
-        console.error(`requestAuthorization error: ${err}`);
-      },
-    );
-  };
+  Chart.defaults.color = '#ccc';
 
-  const queryAggregated = () => {
-    (navigator as any).health.queryAggregated(
+  const graphData = {
+    // 軸ラベル
+    labels: rev?.map((item) => [
+      df.format(item.startDate),
+      dw.format(item.startDate),
+    ]),
+    datasets: [
+      // 表示するデータセット
       {
-        startDate: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000),
-        endDate: new Date(),
-        dataType: 'steps',
-        bucket: 'day',
+        data: rev?.map((item) => item.value),
+        backgroundColor: rev?.map((item) =>
+          [0, 6].includes(item.startDate.getDay())
+            ? 'rgba(255, 99, 132, 1)'
+            : 'rgba(30, 144, 255, 1)',
+        ),
+        label: '歩数一覧',
       },
-      queryAggregatedSuccessCallback,
-      (err: any) => {
-        console.error(`queryAggregated error: ${err}`);
-      },
-    );
-  };
-
-  const queryAggregatedSuccessCallback = (data: queryData[]) => {
-    const totalStep = data.reduce((prev, cur) => prev + cur.value, 0);
-    console.log(`today step count ${data.slice(-1)[0]}`);
-    console.log(`1 month total  ${totalStep.toFixed(1)}`);
-    console.log(`step per day ${(totalStep / data.length).toFixed(1)}`);
-
-    const result = (
-      <div>
-        <div>{`today step count: ${data.slice(-1)[0].value}`}</div>
-        <div>{`1 month total count: ${totalStep.toFixed(1)}`}</div>
-      </div>
-    );
-    setStepElement(result);
+    ],
   };
 
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <button onClick={clickHandler}>get step count from google fit</button>
         <div>{stepResult}</div>
+        <Bar data={graphData} />
+        <div style={{ margin: '5px' }}>
+          <label>
+            取得日数[{dayRange + 1}]
+            <input
+              type="range"
+              min="1"
+              max="30"
+              step="1"
+              style={{ width: '300px', cursor: 'pointer' }}
+              onChange={onDaysChange}
+              defaultValue={dayRange}
+            />
+          </label>
+        </div>
       </header>
     </div>
   );
