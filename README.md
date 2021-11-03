@@ -2,7 +2,10 @@
 
 cordova + [cordova-plugin-health](https://github.com/dariosalvi78/cordova-plugin-health)プラグインを利用して、歩数を取得するサンプル
 
-※歩数は取得できますが、まだ記載途中。
+![img00](./img/img00.png)
+
+
+
 ## 必要なこと
 
 ### Google Cloud Platform コンソールでプロジェクトを作成する。
@@ -110,9 +113,12 @@ cordovaコマンドは、`config.xml`と`wwww`が存在しない場合、`Curren
 1. `mkdir www`
 1. `cordova prepare`
 1. `npm run build`
-1. `cordova run browser`
+1. `cordova run android --target=XXXXXX`
 
 
+---
+
+## 以下、メモ書き
 ```
 cordova plugin add cordova-plugin-health --variable HEALTH_READ_PERMISSION='App needs read access' --variable HEALTH_WRITE_PERMISSION='App needs write access'
 ```
