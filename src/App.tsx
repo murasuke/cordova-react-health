@@ -1,11 +1,11 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { Bar, Chart } from 'react-chartjs-2';
-import './App.css';
+import './App.scss';
 import useFitStepData from './hooks/use-fit-api';
 
 const App = () => {
   const [dayRange, setDayRange] = useState(6);
-  const { getStepData, queryData } = useFitStepData(dayRange);
+  const { queryData } = useFitStepData(dayRange);
   const [stepResult, setStepElement] = useState<React.ReactElement>();
 
   const df = new Intl.DateTimeFormat('ja-JP', {
@@ -30,7 +30,6 @@ const App = () => {
   };
 
   useEffect(() => {
-    //getStepData();
     const totalStep = queryData?.reduce((prev, cur) => prev + cur.value, 0);
     const nf = new Intl.NumberFormat('ja-JP');
 
@@ -83,13 +82,12 @@ const App = () => {
         <Bar data={graphData} />
         <div style={{ margin: '5px' }}>
           <label>
-            取得日数[{dayRange + 1}]
+            取得日数[ {dayRange + 1} ]<br />
             <input
               type="range"
               min="1"
               max="30"
               step="1"
-              style={{ width: '300px', cursor: 'pointer' }}
               onChange={onDaysChange}
               defaultValue={dayRange}
             />

@@ -48,6 +48,7 @@
     "cordova-android": "^9.1.0",
     "cordova-browser": "^6.0.0",
     "cordova-plugin-health": "^2.0.3",
+    "node-sass": "^6.0.1",
     "rewire": "^5.0.0"
   },
   "cordova": {
