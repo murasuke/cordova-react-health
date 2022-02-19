@@ -5,8 +5,27 @@ cordova + [cordova-plugin-health](https://github.com/dariosalvi78/cordova-plugin
 ![img00](./img/img00.png)
 
 
+## How to build & run
+
+cordovaコマンドは、`config.xml`と`wwww`が存在しない場合、`Current working directory is not a Cordova-based project.`というエラーになるため、先に`www`フォルダを作ります。
+
+1. `npm install`
+1. `mkdir www`
+1. `cordova prepare`
+1. `npm run build`
+1. `cordova run android --target=XXXXXX`
 
 ## 必要なこと
+
+## プラグイン[cordova-plugin-health](https://github.com/dariosalvi78/cordova-plugin-health)をインストール
+
+```
+cordova plugin add cordova-plugin-health --variable HEALTH_READ_PERMISSION='App needs read access' --variable HEALTH_WRITE_PERMISSION='App needs write access'
+```
+
+* `config.xml`に`<preference name="AndroidXEnabled" value="true" />`を追加
+
+
 
 ### Google Cloud Platform コンソールでプロジェクトを作成する。
 
@@ -45,12 +64,17 @@ https://console.cloud.google.com/apis/credentials/consent
 
 ![img80](./img/img80.png)
 
-歩数の取得に必要なスコープ不明のため、何も設定せずに次へ
+`スコープを追加または削除`をクリック
+![img91](./img/img92.png)
 
-![img90](./img/img90.png)
+歩数の取得に必要なスコープ(`fitness.activity.read`)を追加
+
+![img91](./img/img91.png)
 
 テストユーザに自分を追加
+
 ![img100](./img/img100.png)
+
 ### 認証情報を作成
 
 https://console.cloud.google.com/apis/credentials
@@ -58,12 +82,13 @@ https://console.cloud.google.com/apis/credentials
 ![img110](./img/img110.png)
 
 `OAuth 2.0 クライアント ID`にAndoroid用のクライアントIDと、ウェブアプリケーション用のIDの2つを追加する。
-画面上部`認証情報の作成`から2つ作成する。
+画面上部`認証情報の作成`⇒`OAuthクライアントID`を選択。
 
 *  cordovaのアプリはネイティブアプリのため`Andoroid用のクライアントID` のみの設定で問題ないと思ったが、API利用の認証を得るために、ウェブアプリケーション用のIDも必要なようです。
 
+* ①Andoroid用のクライアントID作成
 
-
+  ![img120](./img/img120.png)
 
 |  アプリケーション種類  |  android  |
 | ---- | ---- |
@@ -93,40 +118,26 @@ keytool -list -v -keystore "%USERPROFILE%\.android\debug.keystore" -alias androi
 バージョン: 1
 ```
 
-![img120](./img/img120.png)
+* ②ウェブアプリケーションのクライアントID
+
+  ![img130](./img/img130.png)
 
 |  アプリケーション種類  |  ウェブアプリケーション  |
 | ---- | ---- |
 |  承認済みの JavaScript 生成元  |  設定不要 |
 |  承認済みのリダイレクト URI  |  設定不要  |
 
-![img130](./img/img130.png)
 
 
-![img140](./img/img140.png)
+* クライアントID追加後
 
-## How to build & run
+  ![img140](./img/img140.png)
 
-cordovaコマンドは、`config.xml`と`wwww`が存在しない場合、`Current working directory is not a Cordova-based project.`というエラーになるため、先に`www`フォルダを作ります。
-
-1. `npm install`
-1. `mkdir www`
-1. `cordova prepare`
-1. `npm run build`
-1. `cordova run android --target=XXXXXX`
 
 
 ---
 
 ## 以下、メモ書き
-```
-cordova plugin add cordova-plugin-health --variable HEALTH_READ_PERMISSION='App needs read access' --variable HEALTH_WRITE_PERMISSION='App needs write access'
-```
-
-`config.xml`に`<preference name="AndroidXEnabled" value="true" />`を追加
-
-
-
 ```
 npm run build-inlinemap
 cordova run --list
